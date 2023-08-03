@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Visualisation de la donnée Overture Map</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl/dist/maplibre-gl.css" />
+    <script src="https://unpkg.com/maplibre-gl/dist/maplibre-gl.js"></script>
+    <script src="https://unpkg.com/pmtiles@2.5.0/dist/index.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+
+    <script>
+        // add the PMTiles plugin to the maplibregl global.
+        let protocol = new pmtiles.Protocol();
+        maplibregl.addProtocol("pmtiles", protocol.tile);
+
+
+        var map = new maplibregl.Map({
+            container: 'map',
+            style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+            center: [2.190572, 41.401682], // Coordonnées du centre de la carte (long, lat)
+            zoom: 15 // Niveau de zoom initial
+        });
+
+
+
+        // Ajouter les tuiles PMtiles à la carte
+        map.on('load', function() {
+            map.addSource('batiments', {
+                type: "vector",
+                url: "pmtiles://http://tonyhauck.com/projects/PMTiles-with-overture-dataset/ES_geo.pmtiles",
+            });
+
+            map.addLayer({
+                'id': 'batiments',
+                'type': 'fill',
+                'source': 'batiments',
+                'source-layer': 'ES_geo', // Nom de la couche dans les tuiles PMtiles
+                'layout': {},
+                'paint': {
+                    'fill-color': [
+                        'match', ['get', 'class'],
+
+                        "residential", "#FF5733",
+                        "outbuilding", "#33FF57",
+                        "agricultural", "#FF5733",
+                        "commercial", "#5733FF",
+                        "industrial", "#33FF57",
+                        "education", "#FF5733",
+                        "service", "#33FF57",
+                        "religious", "#5733FF",
+                        "civic", "#FF5733",
+                        "transportation", "#33FF57",
+                        "medical", "#5733FF",
+                        "entertainment", "#FF5733",
+                        "military", "#33FF57",
+                        'black'
+
+                    ], // Couleur des bâtiments
+                    'fill-opacity': 0.6
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
